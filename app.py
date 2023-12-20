@@ -45,7 +45,7 @@ def calculate_correlation_model(model, X, y):
     r2 = r2_score(y, y_pred)
     return r2
 
-df = pd.read_excel(excel_file_path, sheet_name='Correlation_data')
+df = pd.read_excel(excel_file_path, sheet_name='Test')
 X = df[['Agriculture', 'Barren/Unculturable Wastelands', 'Builtup', 'Forest', 'Grass/Grazing', 'Snow and Glacier', 'Wet lands/Waterbodies']]  # Replace with actual LULC columns
 y = df['GDP']  # Replace with actual GDP column
 
