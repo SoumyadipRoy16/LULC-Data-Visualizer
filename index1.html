@@ -50,7 +50,76 @@
             text-align: center;
             display: none;
         }
+	
+	    .graph-container {
+			display: flex; /* Use flexbox for layout */
+			align-items: center; /* Center items vertically */
+			justify-content: space-between; /* Distribute items evenly */
+		}
 
+		.image-container {
+			flex: 1; /* Take up remaining space */
+		}
+
+		.influential-section {
+			margin-top: 20px;
+			padding: 15px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			background-color: #f8f8f8;
+		}
+
+		.section-title {
+			font-size: 20px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.influential-list {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.influential-list li {
+			margin-bottom: 10px;
+			font-size: 16px;
+			line-height: 1.5;
+		}
+
+		.most-influential {
+			font-weight: bold;
+			color: #007bff; /* You can change this color to your preference */
+		}
+
+		.feature {
+			margin-right: 10px;
+		}
+
+		.importance {
+			color: #28a745; /* You can change this color to your preference */
+		}
+		
+		.note {
+			color: red;
+		}
+
+		.r2-score {
+			font-size: 18px;
+			margin-top: 20px;
+		}
+
+		.blink {
+			animation: blink-animation 1s steps(2, start) infinite;
+			color: #ff0000
+		}
+
+		@keyframes blink-animation {
+			to {
+				visibility: hidden;
+			}
+		}
+		
 		#mapImage {
 			display: none;
 		}
@@ -146,7 +215,6 @@
 			<select id="graph_type" name="graph_type" style="width: 150px;">
 				<option value="line" {% if graph_type == 'line' %}selected{% endif %}>Line Graph</option>
 				<option value="pie" {% if graph_type == 'pie' %}selected{% endif %}>Pie Chart</option>
-				<option value="correlation" {% if graph_type == 'correlation' %}selected{% endif %}>Correlation</option>
 			</select>
 		</div>	
 		
@@ -154,20 +222,8 @@
 		
         <input type="button" value="Visualize" onclick="validateForm();">
     </form>
-	
-	{% if graph_type == 'correlation' %}
-		<div class="graph-container">
-			<h2>Correlation Matrix</h2>
-			{% if correlation_matrix %}
-				{{ correlation_matrix|safe }}
-			{% else %}
-				<p>No correlation data available.</p>
-			{% endif %}
-		</div>
-	{% endif %}
 		
 	<div class="graph-container">
-		{% if graph_type != 'correlation' %}
 			<img id="mapImage" src="{{ wms_url }}" alt="Map Image">
 
 			<!-- Legend Container -->
@@ -183,30 +239,39 @@
 					{% endif %}
 				</ul>
 			</div>
-		{% endif %}
 	</div>
 	
     <!-- Graph Container (if plot_url exists) -->
-    {% if plot_url %}
-        <div class="graph-container">
-            {% if error_msg %}
-                <p class="error-msg">{{ error_msg }}</p>
-            {% else %}
-                <img src="data:image/png;base64,{{ plot_url }}" alt="Graph">
+<!-- Graph Container (if plot_url exists) -->
+	{% if plot_url %}
+		<div class="graph-container">
+			{% if error_msg %}
+				<p class="error-msg">{{ error_msg }}</p>
+			{% else %}
+				<img src="data:image/png;base64,{{ plot_url }}" alt="Graph">
+
 				{% if influential_attributes %}
-					<div id="influentialAttributes">
-						<h2>Influential Attributes</h2>
+					<div id="influentialAttributes" class="influential-section">
+						<h2 class="section-title">Influential Attributes</h2>
 						<ul class="influential-list">
-							{% for feature, importance in influential_attributes %}
-								<li>{{ feature }}: {{ importance|round(4) }}</li>
+							{% set most_influential = influential_attributes|dictsort(false)|first %}
+							{% for feature, importance in influential_attributes.items() %}
+								<li {% if feature == most_influential[0] %}class="most-influential"{% endif %}>
+									<span class="feature">{{ feature }}:</span> 
+									<span class="importance">{{ importance|round(4) }}</span>
+								</li>
 							{% endfor %}
 						</ul>
+						<p class="note" >Note: The Influential attributes are only trained for the year 2015-16</p>
 					</div>
 				{% endif %}
-            {% endif %}
-        </div>
-    {% endif %}
 
+				<!-- Display R2 score -->
+				<p class="r2-score blink" >R2 Score: {{ r2_score|round(4) }}</p>
+			{% endif %}
+		</div>
+	{% endif %}
+	
     <script>
         // JavaScript to show the legend after the map image is displayed
         document.addEventListener("DOMContentLoaded", function() {
