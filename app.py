@@ -7,7 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 
 app = Flask(__name__)
 
-excel_file_path = r'C:\Users\subho\OneDrive\Documents\LULC DATA.xlsx'
+excel_file_path = r'LULC DATA.xlsx'
 
 df_sheet1 = pd.read_excel(excel_file_path, sheet_name='2015-16')
 df_sheet2 = pd.read_excel(excel_file_path, sheet_name='2005-06')
