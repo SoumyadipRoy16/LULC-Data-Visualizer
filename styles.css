@@ -1,0 +1,154 @@
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+			background-color: #00FF00;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin: 0 auto;
+            width: 100%;
+            text-align: center;
+        }
+        .form-row {
+            margin-bottom: 10px;
+			
+        }
+        label, select, input[type="button"] {
+            display: inline-block;
+            padding: 8px;
+			margin-right: 20px;
+        }
+
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: block; /* Make the button a block element */
+            margin: 10px auto; /* Center the button and add space around it */
+        }
+
+        .error-msg {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .mandatory-msg {
+            background-color: yellow;
+            color: red;
+            padding: 5px;
+            text-align: center;
+            display: none;
+        }
+	
+	    .graph-container {
+			display: flex; /* Use flexbox for layout */
+			align-items: center; /* Center items vertically */
+			justify-content: space-between; /* Distribute items evenly */
+		}
+
+		.image-container {
+			flex: 1; /* Take up remaining space */
+		}
+
+		.influential-section {
+			margin-top: 20px;
+			padding: 15px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			background-color: #f8f8f8;
+		}
+
+		.section-title {
+			font-size: 20px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.influential-list {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.influential-list li {
+			margin-bottom: 10px;
+			font-size: 16px;
+			line-height: 1.5;
+		}
+
+		.most-influential {
+			font-weight: bold;
+			color: #007bff; /* You can change this color to your preference */
+		}
+
+		.feature {
+			margin-right: 10px;
+		}
+
+		.importance {
+			color: #28a745; /* You can change this color to your preference */
+		}
+		
+		.note {
+			color: red;
+		}
+
+		.r2-score {
+			font-size: 18px;
+			margin-top: 20px;
+		}
+
+		.blink {
+			animation: blink-animation 1s steps(2, start) infinite;
+			color: #ff0000
+		}
+
+		@keyframes blink-animation {
+			to {
+				visibility: hidden;
+			}
+		}
+		
+		#mapImage {
+			display: none;
+		}
+		
+        /* Legend styles */
+		#legend {
+			display: none; /* Initially hidden */
+			position: absolute;
+			top: 20px; /* Adjust as needed */
+			right: 20px; /* Adjust as needed */
+			background-color: #fff;
+			border: 1px solid #ccc;
+			padding: 10px;
+			max-width: 300px;
+		}
+
+		.legend-list {
+			list-style-type: none; /* Remove bullet points */
+			padding: 0;
+			margin: 0;
+		}
+
+		.legend-list li {
+			display: flex;
+			align-items: center;
+			margin-bottom: 5px;
+		}
+
+		.legend-color {
+			width: 20px;
+			height: 20px;
+			margin-right: 5px;
+		}
+
+		.legend-color::before {
+			content: ''; /* Remove the marker */
+			display: none;
+		}
