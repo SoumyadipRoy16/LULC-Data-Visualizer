@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>LULC Data Visualizer</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+			background-color: #00FF00;
+        }
+        h1 {
+            text-align: center;
+        }
+        form {
+            margin: 0 auto;
+            width: 100%;
+            text-align: center;
+        }
+        .form-row {
+            margin-bottom: 10px;
+			
+        }
+        label, select, input[type="button"] {
+            display: inline-block;
+            padding: 8px;
+			margin-right: 20px;
+        }
+
+        input[type="button"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: block; /* Make the button a block element */
+            margin: 10px auto; /* Center the button and add space around it */
+        }
+
+        .error-msg {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .mandatory-msg {
+            background-color: yellow;
+            color: red;
+            padding: 5px;
+            text-align: center;
+            display: none;
+        }
+	
+	    .graph-container {
+			display: flex; /* Use flexbox for layout */
+			align-items: center; /* Center items vertically */
+			justify-content: space-between; /* Distribute items evenly */
+		}
+
+		.image-container {
+			flex: 1; /* Take up remaining space */
+		}
+
+		.influential-section {
+			margin-top: 20px;
+			padding: 15px;
+			border: 1px solid #ccc;
+			border-radius: 5px;
+			background-color: #f8f8f8;
+		}
+
+		.section-title {
+			font-size: 20px;
+			font-weight: bold;
+			color: #333;
+		}
+
+		.influential-list {
+			list-style-type: none;
+			padding: 0;
+			margin: 0;
+		}
+
+		.influential-list li {
+			margin-bottom: 10px;
+			font-size: 16px;
+			line-height: 1.5;
+		}
+
+		.most-influential {
+			font-weight: bold;
+			color: #007bff; /* You can change this color to your preference */
+		}
+
+		.feature {
+			margin-right: 10px;
+		}
+
+		.importance {
+			color: #28a745; /* You can change this color to your preference */
+		}
+		
+		.note {
+			color: red;
+		}
+
+		.r2-score {
+			font-size: 18px;
+			margin-top: 20px;
+		}
+
+		.blink {
+			animation: blink-animation 1s steps(2, start) infinite;
+			color: #ff0000
+		}
+
+		@keyframes blink-animation {
+			to {
+				visibility: hidden;
+			}
+		}
+		
+		#mapImage {
+			display: none;
+		}
+		
+        /* Legend styles */
+		#legend {
+			display: none; /* Initially hidden */
+			position: absolute;
+			top: 20px; /* Adjust as needed */
+			right: 20px; /* Adjust as needed */
+			background-color: #fff;
+			border: 1px solid #ccc;
+			padding: 10px;
+			max-width: 300px;
+		}
+
+		.legend-list {
+			list-style-type: none; /* Remove bullet points */
+			padding: 0;
+			margin: 0;
+		}
+
+		.legend-list li {
+			display: flex;
+			align-items: center;
+			margin-bottom: 5px;
+		}
+
+		.legend-color {
+			width: 20px;
+			height: 20px;
+			margin-right: 5px;
+		}
+
+		.legend-color::before {
+			content: ''; /* Remove the marker */
+			display: none;
+		}
+    </style>
+</head>
+<body>
+    <h1>LULC Data Visualizer</h1>
+    <form method="post" id="frm_lulc">
+	
+		<div class="form-row">
+			<label for="selected_year" style="margin-left:-5px;">Select Year:</label>
+			<label for="state_input" style="margin-left:0px;">Select State:</label>
+			<label for="graph_type" style="margin-left:55px;">Choose Graph Type:</label>
+		</div>
+		
+        <div class="form-row">
+            <select id="selected_year" name="selected_year">
+				<option value="" selected disabled>Select Year</option>
+				<option value="2015-16" {% if selected_year == '2015-16' %}selected{% endif %}>2015-16</option>
+				<option value="2005-06" {% if selected_year == '2005-06' %}selected{% endif %}>2005-06</option>
+				<option value="2011-12" {% if selected_year == '2011-12' %}selected{% endif %}>2011-12</option>
+			</select>
+		
+		
+			<select id="state_input" name="state_input">
+				<option value="" selected disabled>Select State</option>
+				<option value="AP" {% if state_input == 'AP' %}selected{% endif %}>AP</option>
+				<option value="AR" {% if state_input == 'AR' %}selected{% endif %}>Arunachal Pradesh</option>
+				<option value="AS" {% if state_input == 'AS' %}selected{% endif %}>Assam</option>
+				<option value="BR" {% if state_input == 'BR' %}selected{% endif %}>Bihar</option>
+				<option value="CH" {% if state_input == 'CH' %}selected{% endif %}>Chattisgarh</option>
+				<option value="GA" {% if state_input == 'GA' %}selected{% endif %}>Goa</option>
+				<option value="GJ" {% if state_input == 'GJ' %}selected{% endif %}>Gujarat</option>
+				<option value="HR" {% if state_input == 'HR' %}selected{% endif %}>Haryana</option>
+				<option value="HP" {% if state_input == 'HP' %}selected{% endif %}>Himachal Pradesh</option>
+				<option value="JK" {% if state_input == 'JK' %}selected{% endif %}>Jammu and Kashmir</option>
+				<option value="JH" {% if state_input == 'JH' %}selected{% endif %}>Jharkhand</option>
+				<option value="KA" {% if state_input == 'KA' %}selected{% endif %}>Karnataka</option>
+				<option value="KL" {% if state_input == 'KL' %}selected{% endif %}>Kerala</option>
+				<option value="MP" {% if state_input == 'MP' %}selected{% endif %}>Madhya Pradesh</option>
+				<option value="MH" {% if state_input == 'MH' %}selected{% endif %}>Maharashtra</option>
+				<option value="MN" {% if state_input == 'MN' %}selected{% endif %}>Manipur</option>
+				<option value="ML" {% if state_input == 'ML' %}selected{% endif %}>Meghalaya</option>
+				<option value="MZ" {% if state_input == 'MZ' %}selected{% endif %}>Mizoram</option>
+				<option value="NL" {% if state_input == 'NL' %}selected{% endif %}>Nagaland</option>
+				<option value="OD" {% if state_input == 'OD' %}selected{% endif %}>Odisha</option>
+				<option value="PB" {% if state_input == 'PB' %}selected{% endif %}>Punjab</option>
+				<option value="RJ" {% if state_input == 'RJ' %}selected{% endif %}>Rajasthan</option>
+				<option value="SK" {% if state_input == 'SK' %}selected{% endif %}>Sikkim</option>
+				<option value="TN" {% if state_input == 'TN' %}selected{% endif %}>Tamil Nadu</option>
+				<option value="TS" {% if state_input == 'TS' %}selected{% endif %}>Telangana</option>
+				<option value="TR" {% if state_input == 'TR' %}selected{% endif %}>Tripura</option>
+				<option value="UP" {% if state_input == 'UP' %}selected{% endif %}>Uttar Pradesh</option>
+				<option value="UK" {% if state_input == 'UK' %}selected{% endif %}>Uttarakhand</option>
+				<option value="WB" {% if state_input == 'WB' %}selected{% endif %}>West Bengal</option>
+			</select>
+        
+			<select id="graph_type" name="graph_type" style="width: 150px;">
+				<option value="line" {% if graph_type == 'line' %}selected{% endif %}>Line Graph</option>
+				<option value="pie" {% if graph_type == 'pie' %}selected{% endif %}>Pie Chart</option>
+			</select>
+		</div>	
+		
+		<div class="mandatory-msg" id="mandatoryMessage" style="display: none;">All Fields are mandatory</div>
+		
+        <input type="button" value="Visualize" onclick="validateForm();">
+    </form>
+		
+	<div class="graph-container">
+			<img id="mapImage" src="{{ wms_url }}" alt="Map Image">
+
+			<!-- Legend Container -->
+			<div id="legend">
+				<h2>Legend</h2>
+				<ul class="legend-list">
+					{% if legend_data %}
+						{% for category, color in legend_data.items() %}
+							<li><span class="legend-color" style="background-color:{{ color }};"></span> {{ category }}</li>
+						{% endfor %}
+					{% else %}
+						<li>No legend data available.</li>
+					{% endif %}
+				</ul>
+			</div>
+	</div>
+	
+    <!-- Graph Container (if plot_url exists) -->
+<!-- Graph Container (if plot_url exists) -->
+	{% if plot_url %}
+		<div class="graph-container">
+			{% if error_msg %}
+				<p class="error-msg">{{ error_msg }}</p>
+			{% else %}
+				<img src="data:image/png;base64,{{ plot_url }}" alt="Graph">
+
+				{% if influential_attributes %}
+					<div id="influentialAttributes" class="influential-section">
+						<h2 class="section-title">Influential Attributes</h2>
+						<ul class="influential-list">
+							{% set most_influential = influential_attributes|dictsort(false)|first %}
+							{% for feature, importance in influential_attributes.items() %}
+								<li {% if feature == most_influential[0] %}class="most-influential"{% endif %}>
+									<span class="feature">{{ feature }}:</span> 
+									<span class="importance">{{ importance|round(4) }}</span>
+								</li>
+							{% endfor %}
+						</ul>
+						<p class="note" >Note: The Influential attributes are only trained for the year 2015-16</p>
+					</div>
+				{% endif %}
+
+				<!-- Display R2 score -->
+				<p class="r2-score blink" >R2 Score: {{ r2_score|round(4) }}</p>
+			{% endif %}
+		</div>
+	{% endif %}
+	
+    <script>
+        // JavaScript to show the legend after the map image is displayed
+        document.addEventListener("DOMContentLoaded", function() {
+            var legendContainer = document.getElementById("legend");
+            {% if legend_data %}
+				changeimagesource();
+                legendContainer.style.display = "block";
+            {% endif %}
+        });
+		
+		function changeimagesource() {
+			document.getElementById("mapImage").style.display = "none";
+			document.getElementById("mapImage").style.display = "inline";
+		}
+		
+        function validateForm() {
+            var selectedYear = document.getElementById("selected_year").value;
+            var selectedStateElement = document.getElementById("state_input");
+            var selectedState = selectedStateElement ? selectedStateElement.value : '';
+            var mandatoryMessage = document.getElementById("mandatoryMessage");
+
+            if (selectedYear === "" || selectedState === "") {
+                mandatoryMessage.style.display = "block";
+                return false;
+            } else {
+                mandatoryMessage.style.display = "none";
+            }
+
+            document.getElementById("frm_lulc").submit();
+        }
+
+        // Adding event listeners to hide mandatory message on dropdown selection
+        document.getElementById("selected_year").addEventListener("change", function() {
+            document.getElementById("mandatoryMessage").style.display = "none";
+        });
+
+        document.getElementById("state_input").addEventListener("change", function() {
+            document.getElementById("mandatoryMessage").style.display = "none";
+        });
+    </script>
+</body>
+</html>
